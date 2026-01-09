@@ -2,6 +2,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 
 import './globals.css';
 
@@ -11,14 +12,19 @@ import { GlobalErrorIndicator } from '../components/GlobalErrorIndicator';
 import { SessionTracker } from '../components/SessionTracker';
 import { SiteProvider } from '../components/SiteProvider';
 import { ThemeProvider } from '../components/ThemeProvider';
+import { WatchRoomProvider } from '../components/WatchRoomProvider';
 import { DownloadProvider } from '../contexts/DownloadContext';
 import { DownloadPanel } from '../components/download/DownloadPanel';
+import ChatFloatingWindow from '../components/watch-room/ChatFloatingWindow';
 
 const inter = Inter({ subsets: ['latin'] });
 export const dynamic = 'force-dynamic';
 
 // 动态生成 metadata，支持配置更新后的标题变化
 export async function generateMetadata(): Promise<Metadata> {
+  // 🔥 调用 cookies() 强制动态渲染，防止 Docker 环境下的缓存问题
+  await cookies();
+
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
   const config = await getConfig();
   let siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'MoonTV';
@@ -42,6 +48,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // 🔥 调用 cookies() 强制动态渲染，防止 Docker 环境下的缓存问题
+  await cookies();
+
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
 
   let siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'MoonTV';
@@ -120,12 +129,15 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <DownloadProvider>
-            <SiteProvider siteName={siteName} announcement={announcement}>
-              <SessionTracker />
-              {children}
-              <GlobalErrorIndicator />
-            </SiteProvider>
-            <DownloadPanel />
+            <WatchRoomProvider>
+              <SiteProvider siteName={siteName} announcement={announcement}>
+                <SessionTracker />
+                {children}
+                <GlobalErrorIndicator />
+              </SiteProvider>
+              <DownloadPanel />
+              <ChatFloatingWindow />
+            </WatchRoomProvider>
           </DownloadProvider>
         </ThemeProvider>
       </body>
