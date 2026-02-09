@@ -25,7 +25,7 @@
 ![HLS.js](https://img.shields.io/badge/HLS.js-1.6.15-ec407a)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Docker Ready](https://img.shields.io/badge/Docker-ready-blue?logo=docker)
-![Version](https://img.shields.io/badge/Version-5.9.3-orange)
+![Version](https://img.shields.io/badge/Version-6.1.1-orange)
 
 </div>
 
@@ -33,7 +33,7 @@
 
 ## 📢 Project Overview
 
-This project is a deeply customized version based on **MoonTV**, continuously developed from **v4.3.1** to the current **v5.9.3**, with **60+ major feature modules** and **400+ detailed optimizations** added. See [CHANGELOG](CHANGELOG) for all new features.
+This project is a deeply customized version based on **MoonTV**, continuously developed from **v4.3.1** to the current **v6.1.1**, with **60+ major feature modules** and **400+ detailed optimizations** added. See [CHANGELOG](CHANGELOG) for all new features.
 
 ### 💡 Core Enhancement Highlights
 
@@ -41,19 +41,22 @@ This project is a deeply customized version based on **MoonTV**, continuously de
 - **YouTube Integration**: Complete YouTube search, playback, live streaming with cookieless domain support
 - **Cloud Drive Search (PanSou)**: Integrated advanced filtering and cache management
 - **ACG Torrent Search**: Integrated ACG anime torrent resource search for rich anime content access
-- **Short Drama Features**: Search, playback, dedicated detail pages, mobile API proxy, auto-skip to next episode when backup API unavailable
+- **Mikan Project Integration**: ACG search dual-source system (ACG.RIP and Mikan Project), supports source switching, unified response format, and complete torrent metadata
+- **Short Drama Features**: Search, playback, dedicated detail pages, mobile API proxy, auto-skip to next episode when backup API unavailable, fallback API support
 - **IPTV Live TV**: m3u/m3u8 subscriptions, EPG program guide (multi-source & url-tvg support), source aggregation, logo proxy, channel search within current source, live source tab quick search, long channel name click-to-expand
-- **Bangumi Anime**: Intelligent anime detection, API integration, caching mechanism
-- **Traditional Chinese Search Support**: Smart Traditional-Simplified conversion, multi-strategy search, lightweight switch-chinese library, optimized Traditional Chinese user search experience
+- **Bangumi Anime**: Intelligent anime detection, API integration, caching mechanism, anime content details prioritize Bangumi API
+- **Traditional Chinese Search Support**: Smart Traditional-Simplified conversion, multi-strategy search, lightweight switch-chinese library, optimized Traditional Chinese user search experience, intelligent search variant detection
 - **2026 Year Filter**: Add 2026 year filter option for Douban content, easily find latest releases
 
 #### 🤖 AI Recommendation System
 - **AI Smart Assistant**: Global AI recommendation button (ModernNav header), GPT-5/o series support, dynamic prompts, 85-90% input latency optimization, streaming transmission, orchestrator, video context support, integrated Douban and TMDB data, auto TMDB search when ID missing
+- **Short Drama AI Chat**: AI chat functionality for ShortDramaCard component, intelligent recommendations and content analysis
 - **Tavily Search Mode**: Supports Tavily search mode without AI API requirement, flexible API verification, SSE streaming, friendly user guidance
 - **Multiple Card Types**: Video recommendations, YouTube videos, video link parsing
 - **TMDB Actor Search**: Complete actor search, filtering, and caching
 - **Interactive Actor Works Viewer**: Inline actor works display in play page, 2-hour cache, TMDB fallback source
 - **Release Calendar & Upcoming Releases**: Upcoming content preview and tracking, support favoriting upcoming releases, automatically becomes playable after release, 2026 release data crawler
+- **TanStack Query State Management**: Implement TanStack Query for global state management, optimized data fetching and caching
 
 #### 💬 Danmaku Ecosystem
 - **Third-party Danmaku API**: Integrated Tencent Video, iQiyi, Youku, Bilibili platforms, smart content matching prevents trailers
@@ -69,6 +72,22 @@ This project is a deeply customized version based on **MoonTV**, continuously de
 - **Auto-Retry Mechanism**: 403 error auto-retry, ensures trailer continuous availability
 - **Performance Logging**: Complete trailer loading performance monitoring and logging
 - **TV Series Support**: Extended trailer support to TV series and non-movie content
+- **🚀 Video Cache Optimization (Kvrocks)**: Two-layer cache architecture dramatically reduces traffic consumption
+  - **Kvrocks Metadata Cache**: URL mapping and file info (15-minute TTL)
+  - **File System Video Cache**: Local storage of video content (12-hour TTL, max 500MB)
+  - **Smart Cache Hit**: After first download, subsequent requests served from local files
+  - **96% Traffic Savings**: 28 requests reduced from 932MB to 33MB (real data)
+  - **Response Speed Boost**: From seconds to milliseconds
+  - **Auto Expiration Cleanup**: Scheduled cleanup of expired cache, freeing storage space
+  - **Cache Stats API**: `GET /api/video-cache/stats` to view cache usage
+
+#### 📊 Performance & Monitoring System
+- **Performance Monitoring Dashboard**: Complete performance monitoring system supporting all APIs (Douban, search, list, details, playback records, favorites, skip config, short dramas)
+- **Industry Benchmark Rating**: Built-in industry benchmark rating system for real-time API performance evaluation
+- **Traffic Monitoring System**: Real-time traffic monitoring, external traffic domain breakdown, request list display with collapsible sections
+- **Cron Task Monitoring**: Cron monitoring with API filtering and 48-hour auto-cleanup
+- **Configurable Task Optimization**: Configurable cron task optimization to reduce outbound traffic
+- **Kvrocks Persistence**: Kvrocks persistence for cron, Douban search API, and external traffic monitoring
 
 #### 🔧 Proxy Configuration System
 - **Dual-Layer Proxy Architecture**: TVBox and video playback independent proxy configs, no interference
@@ -100,6 +119,17 @@ This project is a deeply customized version based on **MoonTV**, continuously de
 - **Mixed Content Handling**: Optimized CORS detection handles mixed content situations
 - **CORS Statistics Panel**: Admin backend displays direct/proxy mode statistics
 - **Auto Fallback**: Automatically switch to proxy mode when CORS unavailable
+
+#### 🔐 Trusted Network Mode
+- **LAN Deployment Login-Free**: LAN/intranet deployments can skip login authentication, convenient for home use
+- **IP Whitelist**: Support configuring trusted IP addresses or CIDR ranges
+- **IPv6 Support**: Full IPv6 address whitelist configuration support
+- **24-Hour Cache Optimization**: Config changes take effect immediately via cookie version mechanism
+
+#### ⚖️ Video Source Weight System
+- **Source Priority Configuration**: Set weight values for each video source to control playback source selection priority
+- **Smart Source Sorting**: Auto-sort available playback sources by weight
+- **Flexible Adjustment**: Visual weight adjustment in admin backend
 
 #### 📊 User Management Enhancement
 - **Multi-Provider OIDC Authentication**: Support multiple OAuth providers simultaneously (Google, Microsoft, GitHub, Facebook, WeChat, Apple, LinuxDo), users can choose their preferred login method
@@ -194,6 +224,8 @@ This project is a deeply customized version based on **MoonTV**, continuously de
 - **Enhanced Storage Modes**: Full Kvrocks/Redis/Upstash support, memory cache prevents QuotaExceededError, handles Redis tag serialization
 - **User Registration System** (configurable toggle)
 - **Image Proxy Optimization**: Improved image proxy performance and caching strategy, supports Baidu image proxy option, provides more proxy methods
+- **Douban Anti-Crawler Verification**: Douban anti-crawler verification mechanism with Cookies authentication support, improving data acquisition stability
+- **Enhanced Ad Filtering**: Keyword-based intelligent ad detection, automatic identification and filtering of ad content
 
 ---
 
@@ -227,6 +259,7 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
 - ✅ Multi-source video aggregation search (streaming output, smart variants, language-aware filtering, fallback API support, Traditional Chinese support)
 - ✅ YouTube integration (search, live streaming, iframe playback, time filtering & sorting)
 - ✅ Cloud drive search (PanSou integration, advanced filtering, cache management)
+- ✅ ACG torrent search (ACG.RIP and Mikan Project dual-source system, source switching, unified response format, complete torrent metadata)
 - ✅ Short drama features (search, playback, dedicated detail pages, mobile API proxy)
 - ✅ IPTV live TV (m3u subscriptions, EPG guide, multi-source support, url-tvg, source aggregation, channel search, long channel name click-to-expand)
 - ✅ Bangumi anime (info detection, API integration, 3-6 digit ID support)
@@ -236,6 +269,8 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
 
 ### 🤖 Smart Recommendations
 - ✅ AI recommendation system (GPT-5/o support, dynamic prompts)
+- ✅ Short Drama AI Chat (ShortDramaCard component AI chat functionality, intelligent recommendations and content analysis)
+- ✅ TanStack Query state management (global state management, optimized data fetching and caching)
 - ✅ Release calendar (upcoming content preview)
 - ✅ Douban details enhancement (complete cast & crew info, user reviews display)
 - ✅ Smart search optimization (language-aware, fuzzy matching)
@@ -288,11 +323,14 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
 - ✅ Completed series badges (based on vod_remarks, search API priority)
 - ✅ Search result filtering (source, title, year filtering, year sorting)
 - ✅ Video card right-click/long-press menu (new tab play, favorites, etc.)
+- ✅ Short drama card right-click/long-press menu (context menu with quick actions support)
 - ✅ z-index hierarchy optimization (cards, badges, modals display correctly)
 
 ### 🔐 Security & Storage
 - ✅ TVBox complete ecosystem (IP whitelist, user-specific Token auth, full API compatibility, intelligent search proxy, manual source toggle, complete source parsing)
 - ✅ TVBox intelligent search proxy (adult content filtering, path prefix support, UI controls)
+- ✅ Trusted network mode (LAN deployment login-free, IP whitelist, IPv6 support, 24-hour cache optimization)
+- ✅ Video source weight system (source priority configuration, smart source sorting, visual adjustment)
 - ✅ Adult content management system (dual-layer filtering, auto-detection, batch operations, user/group-level controls)
 - ✅ Video source import/export (array/config file formats, backup & migration, quick copy buttons)
 - ✅ Fallback API support (primary API failure auto-switching, improved system stability)
@@ -318,6 +356,11 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
 - ✅ Semantic versioning (Git tag-based, CHANGELOG auto-extraction)
 - ✅ HLS.js mobile optimization (buffer strategy, memory management, ABR optimization)
 - ✅ Douban details engine refactor (accurate parsing based on real HTML structure)
+- ✅ Performance monitoring system (complete performance monitoring dashboard, all API support, industry benchmark rating system)
+- ✅ Traffic monitoring system (real-time traffic monitoring, external traffic domain breakdown, request list display with collapsible sections)
+- ✅ Cron task monitoring (cron monitoring, API filtering, 48-hour auto-cleanup)
+- ✅ Kvrocks persistence (for cron, Douban search API, and external traffic monitoring)
+- ✅ Video caching system (12-hour TTL video cache, Kvrocks metadata cache, filesystem video cache, smart cache hits)
 
 ---
 
@@ -328,6 +371,8 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
   - [Docker Deployment (Recommended)](#-recommended-kvrocks-storage)
   - [fnOS Deployment](#-fnos-feiniao-nas-deployment)
   - [Zeabur Deployment (Recommended)](#️-zeabur-deployment-recommended)
+  - [Hugging Face Space Deployment (Free)](#-hugging-face-space-deployment-free)
+  - [EdgeOne Pages Deployment (Free)](#-edgeone-pages-deployment-free)
   - [Vercel Deployment (Serverless)](#-vercel-deployment-serverless)
 - [Configuration File](#️-configuration-file)
 - [Environment Variables](#-environment-variables)
@@ -360,6 +405,31 @@ This project is licensed under **CC BY-NC-SA 4.0**, with the following terms:
 ---
 
 ## 🚀 Deployment
+
+### 💻 Minimum System Requirements
+
+To ensure smooth operation, your server should meet the following minimum specifications:
+
+#### Docker Self-Hosted Deployment
+- **CPU**: 2 cores (4 cores recommended)
+- **RAM**: 2GB (4GB recommended)
+- **Storage**: 10GB available space (20GB recommended for video cache and database)
+- **Network**: 10Mbps upload bandwidth (100Mbps recommended)
+
+#### Zeabur / Vercel Cloud Deployment
+- **No Server Required**: Platform automatically allocates resources
+- **Zeabur**: Developer Plan provides up to 2 vCPU and 4GB RAM ($5/month with $5 credit, free if usage doesn't exceed credit)
+- **Vercel**: Serverless architecture with automatic scaling
+
+#### ⚠️ Common Performance Issues
+- ❌ **Insufficient CPU**: Single-core or low-frequency CPU causes slow video transcoding and search
+- ❌ **Low Memory**: Less than 2GB RAM leads to frequent OOM (Out of Memory) errors
+- ❌ **Low Bandwidth**: Upload bandwidth below 5Mbps causes video playback stuttering
+- ❌ **Slow Disk I/O**: Using HDD affects database and cache performance
+
+**💡 Tip**: If you experience lag, please check if your server meets the minimum requirements first!
+
+---
 
 ### ⚡ One-Click Deploy to Zeabur (Easiest)
 
@@ -400,9 +470,12 @@ services:
       - PASSWORD=your_secure_password
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
       - KVROCKS_URL=redis://moontv-kvrocks:6666
+      - VIDEO_CACHE_DIR=/app/video-cache  # Video cache directory
       # Optional: Site configuration
       - SITE_BASE=https://your-domain.com
       - NEXT_PUBLIC_SITE_NAME=LunaTV Enhanced
+    volumes:
+      - video-cache:/app/video-cache  # Video cache persistence
     networks:
       - moontv-network
     depends_on:
@@ -423,6 +496,7 @@ networks:
 
 volumes:
   kvrocks-data:
+  video-cache:  # Video cache volume
 ```
 
 ### 🔴 Redis Storage (Risk of Data Loss)
@@ -589,6 +663,7 @@ Zeabur is a one-stop cloud deployment platform. Using pre-built Docker images al
    # Required: Storage Configuration
    NEXT_PUBLIC_STORAGE_TYPE=kvrocks
    KVROCKS_URL=redis://apachekvrocks:6666
+   VIDEO_CACHE_DIR=/app/video-cache
 
    # Optional: Site Configuration
    SITE_BASE=https://your-domain.zeabur.app
@@ -656,6 +731,186 @@ When a new Docker image version is released, Zeabur won't automatically update. 
 - **Region Selection**: Recommend choosing the region closest to your users
 - **Service Networking**: Services in the same Project communicate via service names (e.g., `apachekvrocks:6666`)
 - **Persistent Storage**: KVRocks must configure persistent volume to `/var/lib/kvrocks/db` directory, otherwise data will be lost on restart
+
+---
+
+### 🤗 Hugging Face Space Deployment (Free)
+
+[Hugging Face Spaces](https://huggingface.co/spaces) offers free Docker container hosting with **2 vCPU, 16GB RAM, and 50GB storage**, perfect for personal use.
+
+#### Deployment Steps
+
+1. **Create Hugging Face Account**
+   - Visit [huggingface.co](https://huggingface.co/) and register
+
+2. **Create New Space**
+   - Visit [huggingface.co/new-space](https://huggingface.co/new-space)
+   - Enter Space name (e.g., `lunatv`)
+   - **Space SDK**: Select `Docker`
+   - **Space hardware**: Select `CPU basic` (Free)
+   - Click `Create Space`
+
+3. **Configure README.md**
+
+   Create or edit `README.md` in the Space repository root with YAML metadata:
+
+   ```yaml
+   ---
+   title: LunaTV
+   emoji: 🎬
+   colorFrom: green
+   colorTo: blue
+   sdk: docker
+   app_port: 3000
+   pinned: false
+   ---
+   ```
+
+   > 💡 **Key config**: `app_port: 3000` tells HF the app runs on port 3000
+
+4. **Create Dockerfile**
+
+   Create `Dockerfile` in the Space repository root with just one line:
+
+   ```dockerfile
+   FROM ghcr.io/szemeng76/lunatv:latest
+   ```
+
+   > 💡 This uses the official LunaTV Docker image directly, no build required
+
+5. **Configure Environment Variables (Secrets)**
+
+   On Space page, click `Settings` > `Variables and secrets`, add these Secrets:
+
+   | Variable | Description | Example |
+   |----------|-------------|---------|
+   | `USERNAME` | Admin username | `admin` |
+   | `PASSWORD` | Admin password | `your_secure_password` |
+   | `NEXT_PUBLIC_STORAGE_TYPE` | Storage type | `upstash` |
+   | `UPSTASH_URL` | Upstash REST URL | `https://xxx.upstash.io` |
+   | `UPSTASH_TOKEN` | Upstash Token | `AxxxQ==` |
+   | `DISABLE_HERO_TRAILER` | Disable homepage trailer | `true` |
+
+   > ⚠️ **Note**: HF Space has no persistent storage, must use external database like Upstash
+   >
+   > 💡 **Recommended**: Set `DISABLE_HERO_TRAILER=true` to disable homepage trailer, as trailer URLs expire periodically and platforms without persistent storage cannot cache videos, requiring re-download on every refresh
+
+6. **Wait for Deployment**
+   - After committing files, HF will automatically pull the image and start the container
+   - Once deployed, visit `https://huggingface.co/spaces/your-username/lunatv`
+
+#### 📁 Complete File Structure
+
+```
+your-space/
+├── README.md      # Contains YAML metadata
+└── Dockerfile     # FROM ghcr.io/szemeng76/lunatv:latest
+```
+
+#### ✨ Hugging Face Space Advantages
+
+- ✅ **Completely Free**: 2 vCPU, 16GB RAM, 50GB storage
+- ✅ **No Server Required**: Hosted on HF cloud
+- ✅ **Auto HTTPS**: Built-in SSL certificate
+- ✅ **Simple Deployment**: Only two files needed
+- ✅ **Official Image**: No build required, direct pull
+
+#### ⚠️ Hugging Face Space Considerations
+
+- **No Persistent Storage**: Must use external database like Upstash
+- **Cold Start**: First access after long idle period is slow (~30-60 seconds)
+- **48-hour Sleep**: Free tier sleeps after 48 hours of inactivity, restarts on next access
+- **Public Repository**: Space repository is public by default, except Secrets
+- **Traffic Limits**: Free tier has traffic limits, sufficient for personal use
+
+#### 🔗 Related Links
+
+- [Hugging Face Spaces Docs](https://huggingface.co/docs/hub/spaces)
+- [Docker Spaces Docs](https://huggingface.co/docs/hub/spaces-sdks-docker)
+- [Upstash Free Redis](https://upstash.com/)
+
+---
+
+### 🌐 EdgeOne Pages Deployment (Free)
+
+[EdgeOne Pages](https://edgeone.ai/products/pages) is Tencent Cloud's edge computing platform, similar to Vercel, supporting Next.js SSR/SSG/ISR deployment, ideal for users in China.
+
+#### Deployment Steps
+
+1. **Prerequisites**
+   - Register an [EdgeOne](https://edgeone.ai/) account
+   - Create a Redis instance on [Upstash](https://upstash.com/) (EdgeOne Pages has no persistent storage)
+   - Fork this project to your GitHub/GitLab account
+
+2. **Create Pages Project**
+   - Login to EdgeOne Console
+   - Go to "Pages" > "Create Project"
+   - Select "Connect Git Repository"
+   - Authorize and select your forked LunaTV repository
+
+3. **Configure Build Settings**
+   - **Framework Preset**: Select `Next.js`
+   - **Build Command**: `pnpm build` (or keep default)
+   - **Output Directory**: `.next` (default)
+   - **Node.js Version**: `20` (recommended)
+
+4. **Configure Environment Variables**
+
+   Add the following environment variables in project settings:
+
+   ```env
+   # Required: Admin account
+   USERNAME=admin
+   PASSWORD=your_secure_password
+
+   # Required: Storage configuration (must use Upstash)
+   NEXT_PUBLIC_STORAGE_TYPE=upstash
+   UPSTASH_URL=https://your-redis-instance.upstash.io
+   UPSTASH_TOKEN=AxxxxxxxxxxxxxxxxxxxxxxxxxxxQ==
+
+   # Recommended: Disable homepage trailer (recommended for platforms without persistent storage)
+   DISABLE_HERO_TRAILER=true
+
+   # Optional: Site configuration
+   SITE_BASE=https://your-project.edgeone.app
+   NEXT_PUBLIC_SITE_NAME=LunaTV Enhanced
+
+   # Optional: Douban proxy configuration (recommended)
+   NEXT_PUBLIC_DOUBAN_PROXY_TYPE=cmliussss-cdn-tencent
+   NEXT_PUBLIC_DOUBAN_IMAGE_PROXY_TYPE=cmliussss-cdn-tencent
+   ```
+
+5. **Deploy Project**
+   - Click "Deploy" button
+   - Wait for build to complete (first time ~3-5 minutes)
+   - After deployment, you'll get a `xxx.edgeone.app` domain
+
+6. **Bind Custom Domain (Optional)**
+   - Click "Domains" in project settings
+   - Add custom domain and configure DNS resolution
+
+#### ✨ EdgeOne Pages Advantages
+
+- ✅ **China-Friendly**: Tencent Cloud edge nodes, fast access in China
+- ✅ **Generous Free Tier**: 3M Edge Functions requests, 1M Cloud Functions requests, 500 builds per month, unlimited traffic
+- ✅ **Auto HTTPS**: Free SSL certificate
+- ✅ **Git Auto Deploy**: Push code triggers automatic build
+- ✅ **Next.js SSR Support**: Full server-side rendering support
+
+#### ⚠️ EdgeOne Pages Considerations
+
+- **No Docker Support**: EdgeOne Pages is serverless, only supports source code build deployment
+- **Must Use Upstash**: No persistent filesystem, requires external database
+- **Function Execution Limits**: Single request has execution time limit (typically 30 seconds)
+- **No Video Caching**: No local filesystem, video caching feature unavailable
+- **Build Resource Limits**: Free tier has build time and memory limits
+
+#### 🔗 Related Links
+
+- [EdgeOne Pages Pricing](https://pages.edgeone.ai/pricing)
+- [EdgeOne Pages Docs (International)](https://edgeone.ai/zh/document/160427672961769472)
+- [EdgeOne Pages Docs (China)](https://cloud.tencent.com/document/product/1552/127366)
+- [Upstash Free Redis](https://upstash.com/)
 
 ---
 
@@ -727,6 +982,7 @@ Perfect for users without servers. Completely free deployment (Vercel Free Tier 
 - **Serverless Constraints**: Vercel free tier has 10-second function execution time limit, some time-consuming operations may timeout
 - **Traffic Limit**: Vercel free tier provides 100GB monthly bandwidth, sufficient for personal use
 - **Cold Start**: First visit after long inactivity may be slower (approximately 1-3 seconds)
+- **No Video Caching**: Vercel has no persistent file system, video caching feature is unavailable (videos still play normally, just require proxy requests each time)
 - **Limited Features**: Due to serverless architecture, the following features may be restricted:
   - High concurrent search requests
   - Long video danmaku loading
@@ -815,6 +1071,14 @@ You can also enter specific content like "Harry Potter", which works the same as
 | `UPSTASH_URL`     | Upstash endpoint       | `https://xxx.upstash.io`       |
 | `UPSTASH_TOKEN`   | Upstash Token          | `AxxxxxxxxxxxxxxxxxxxxxxxxxxxQ==` |
 
+> 💡 **Redis-Compatible Services**: `REDIS_URL` supports all Redis protocol compatible services, including:
+> - Self-hosted Redis / KVRocks
+> - [Redis Cloud](https://redis.io/cloud/) - Official cloud service, free 30MB
+> - [Aiven Valkey](https://aiven.io/valkey) - Free 1GB, Redis 7.2 compatible
+> - [Northflank](https://northflank.com/dbaas/managed-redis) - Free 256MB
+>
+> ⚠️ **Use Upstash for Vercel deployments**: Vercel Serverless functions are stateless and may cold-start new instances on each request. TCP-based Redis services (Redis Cloud, Aiven, Northflank, etc.) will experience connection pool failures, high cold-start latency, and connection exhaustion in this environment. Upstash uses HTTP REST API, which is naturally suited for Serverless environments and is the only recommended storage for Vercel deployments.
+
 ### Optional Configuration
 
 | Variable                                | Description              | Default     | Options                    |
@@ -829,6 +1093,12 @@ You can also enter specific content like "Harry Potter", which works the same as
 | `NEXT_PUBLIC_DOUBAN_IMAGE_PROXY`        | Custom image proxy       | Empty       | URL prefix                 |
 | `NEXT_PUBLIC_DISABLE_YELLOW_FILTER`     | Disable adult filter     | `false`     | `true` / `false`           |
 | `NEXT_PUBLIC_FLUID_SEARCH`              | Streaming search output  | `true`      | `true` / `false`           |
+| `DISABLE_HERO_TRAILER`                  | Disable hero trailer     | `false`     | `true` / `false`           |
+
+> 💡 **DISABLE_HERO_TRAILER**: Hero banner trailers consume significant bandwidth, and trailer URLs contain timestamps that expire periodically.
+> - **Vercel**: Automatically disabled (no configuration needed)
+> - **Docker/VPS (with persistent volumes)**: No need to disable, videos are cached locally (`VIDEO_CACHE_DIR`), auto-refreshes and re-caches when URL expires
+> - **ClawCloud, HF Space, EdgeOne Pages and other non-persistent platforms**: Recommend setting `DISABLE_HERO_TRAILER=true`, as videos cannot be cached and must be re-downloaded on every refresh when URLs expire
 
 ### Douban Proxy Options
 
@@ -1054,35 +1324,55 @@ This project works with [OrionTV](https://github.com/zimplexing/OrionTV) on Andr
 
 For complete feature updates and bug fixes, see [CHANGELOG](CHANGELOG).
 
-### Latest Version: v5.9.3 (2026-01-13)
+### Latest Version: v6.1.1 (2026-02-01)
 
 #### Added
-- 📱 Long Channel Name Click-to-Expand: Added click-to-expand/collapse for long channel names on mobile
-- ⚡ Download Feature Enhancement: Added segment duration tracking, time range, and total duration display for complete videos
-- 🔍 Traditional Chinese Search Support: Added Traditional Chinese search functionality, improved Traditional user search experience
-- 📅 2026 Year Filter Option: Added 2026 year filter option for Douban content
-- 📚 fnOS Deployment Guide: Added Feiniao NAS (fnOS) deployment guide to README
-- 📺 TVBox Source Management Enhancement: Added manual toggle control and complete source parsing support
-- 🖼️ Baidu Image Proxy Option: Added Baidu image proxy option for Douban images, providing more proxy methods
+- 🔍 Search History UX Optimization: Always show search history when clearing input
+- 💾 ACG Search Database Cache: Add database caching for ACG search, improve search experience
+- ✏️ Video Source Editing: Add video source editing functionality, improve short drama processing logic
+- 📊 Performance Monitor Enhancement: Display CPU core count and model name, add process-level metrics
+- 🔄 Homepage Data Cache: Implement GlobalCacheContext for homepage data global caching
+- 💬 Danmaku System Enhancement: Anti-overlap toggle, real-time slider controls, custom danmaku API support
+- 📦 Video Cache LRU Eviction: Implement video cache LRU eviction strategy
+- 🔐 Trusted Network Mode: LAN deployment can skip login authentication, supports IPv6 whitelist
+- ⚖️ Video Source Weight/Priority System: Add source weight system to optimize playback source selection
+- 🎌 Bangumi API Priority: Anime content details prioritize Bangumi API
+- 🔍 Smart Search Variant Detection: Add intelligent search variant detection, support parallel execution
+- 📹 Short Drama Fallback API: Add fallback API support for short drama recommendations and list
+- 🎬 DISABLE_HERO_TRAILER Environment Variable: Add environment variable to control trailer playback
+- 📚 Deployment Documentation Update: Add HF Space and EdgeOne Pages deployment guides
 
-#### Performance Optimizations
-- ⚡ Traditional Chinese Search Comprehensive Optimization: Lightweight switch-chinese library, tree-shakeable imports, singleton pattern, multi-strategy search, limited conversion range (top 3 variants), removed redundant detect() calls
-- 🔧 TVBox Optimization: User-Agent updated to okhttp/4.1.0, optimized admin backend toggle layout
-- 🚀 User-Agent Comprehensive Upgrade: Updated all User-Agents to 2026 latest versions (Chrome 135, Firefox 146, Safari 26, Edge 143)
-- ⚡ Image Proxy Performance Optimization: Improved image proxy performance and caching strategy
+#### Changed
+- 🔨 Refactor Short Drama Source Aggregation: Dynamic category detection, improve short drama source aggregation logic
+- ⚡ Cron API Comprehensive Optimization: Concurrent processing, timeout control, monitoring, retry mechanism, task statistics and parallelization
+- ⚡ Live Channel Performance Optimization: Add timeout control and EPG caching
+- ⚡ AI Recommendation Request Optimization: Only send AI recommendation requests when backend switch is enabled
+- ⚡ Redis Optimization: Replace KEYS with SCAN to avoid blocking, reduce Upstash command usage
+- ⚡ Douban Page Smart Debounce: Add intelligent debounce and flushSync optimization
+- ⚡ Video Cache Optimization: Optimize cleanup logic, error handling, increase cache limit
+- ⚡ Trusted Network Cache Optimization: 24-hour cache, immediate config refresh via cookie version number
 
 #### Fixed
-- 🐛 Fixed Live Mobile Channel Name Display: Optimized mobile channel name display, added chevron indicators for expandable names
-- 🐛 Fixed HeroBanner Title Overflow: Removed max-width constraint, prevent title truncation and container overflow
-- 🐛 Fixed Tavily API Key Unsaved Warning: Added unsaved changes warning
-- 🐛 Fixed EPG Channel Parsing: Support multi-line XML format channel parsing
-- 🐛 Fixed TVBox Config and Parsing: Support encrypted config (Base64), JSON comment parsing, M3U8 proxy source key propagation, full URL resolution fixes live segment 500 error
-- 🐛 Fixed TVBox Functionality Issues: AdminConfig type definition, edit mode toggle state updates, parsing and playback mode improvements
-- 🐛 Fixed UI Issues: Tab button visibility and mobile responsiveness, search category button dark mode contrast, ScrollableRow hidden button pointer event capture, Firefox hover disappearance
-- 🐛 Fixed Deployment Issues: Zeabur deployment standalone mode, time range display condition operator precedence, Traditional-Simplified conversion application scope
+- 🐛 Fixed UserMenu Navigation Freeze: Resolve navigation freeze through router optimization
+- 🐛 Fixed ACG Search Button Display: Improve ACG search button display logic for anime content
+- 🐛 Fixed Short Drama System: Replace failed API, resolve CORS issues, validate empty data, fix field mapping, auto-select category, hide zero ratings, prevent empty cache
+- 🐛 Fixed Config Subscription Override: Preserve user manually modified config (live source, custom category disabled state)
+- 🐛 Fixed Source Details Premature Set: Remove premature setAvailableSources call in fetchSourceDetail
+- 🐛 Fixed Filter Tag Sort Selection: Always show sort selection
+- 🐛 Fixed Cron Performance Threshold: Use relaxed performance threshold for task evaluation
+- 🐛 Fixed Playback Record Parameters: Pass douban_id and type to VideoCard
+- 🐛 Fixed Mobile Responsiveness: Spider Jar status overflow, TVBox security config, trusted network config, admin page bottom padding, short drama card badge overlap
+- 🐛 Fixed Danmaku System: Filter placeholder danmaku, correct response validation and timeout input UX
+- 🐛 Fixed Samsung Browser Dark Mode: Add color-scheme meta tag
+- 🐛 Fixed Stream Proxy Concurrent Requests: Prevent concurrent requests, remove Content-Length header
+- 🐛 Fixed Vercel Trailer Bandwidth: Disable homepage trailer video in Vercel environment
+- 🐛 Fixed Kvrocks Persistence: Disable external traffic monitoring and performance monitoring persistence
 
 ### Major Milestone Versions
 
+- **v6.1.1**: Trusted network mode, video source weight system, Bangumi API priority, smart search variants, short drama fallback API, danmaku system enhancement, video cache LRU eviction, config subscription fix
+- **v6.1.0**: Performance monitoring system, traffic monitoring system, TanStack Query state management, Kvrocks persistence, Douban anti-crawler verification, Mikan Project integration, video caching system, short drama AI chat, enhanced ad filtering
+- **v6.0.0**: Homepage performance drastically optimized (CPU reduced to 50-80%), Puppeteer anti-scraping system, Douban mobile API fallback, Web Worker optimization, playback progress restore, dependency upgrades
 - **v5.9.3**: Traditional Chinese search support, download feature enhancement, TVBox source management enhancement, User-Agent comprehensive upgrade to 2026 latest versions, Baidu image proxy, fnOS deployment guide
 - **v5.9.2**: Douban Trailer System Enhancement, Proxy Configuration System, M3U8 Downloader 6x Speed Boost, EPG System Enhancement, Live Direct Connect Mode, Mobile Navigation Netflix-style Redesign
 - **v5.9.1**: Glassmorphism Design, Material UI CategoryBar, Netflix-style HeroBanner, AI Feature Comprehensive Enhancement, Douban Cache Optimization

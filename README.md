@@ -25,7 +25,7 @@
 ![HLS.js](https://img.shields.io/badge/HLS.js-1.6.15-ec407a)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Docker Ready](https://img.shields.io/badge/Docker-ready-blue?logo=docker)
-![Version](https://img.shields.io/badge/Version-5.9.3-orange)
+![Version](https://img.shields.io/badge/Version-6.1.1-orange)
 
 </div>
 
@@ -33,7 +33,7 @@
 
 ## 📢 项目说明
 
-本项目是在 **MoonTV** 基础上进行的深度二次开发版本，从 **v4.3.1** 版本开始，持续迭代至当前 **v5.9.3**，累计新增 60+ 重大功能模块，400+ 细节优化。所有新增功能详见 [CHANGELOG](CHANGELOG)。
+本项目是在 **MoonTV** 基础上进行的深度二次开发版本，从 **v4.3.1** 版本开始，持续迭代至当前 **v6.1.1**，累计新增 60+ 重大功能模块，400+ 细节优化。所有新增功能详见 [CHANGELOG](CHANGELOG)。
 
 ### 💡 核心增强亮点
 
@@ -41,19 +41,22 @@
 - **YouTube 集成**：完整的 YouTube 搜索、播放、直播功能，支持无 Cookie 域名减少验证
 - **网盘搜索 (PanSou)**：集成高级筛选和缓存管理的网盘资源搜索
 - **ACG种子搜索**：集成ACG动漫种子资源搜索功能，提供丰富的动漫资源获取渠道
-- **短剧完整功能**：短剧搜索、播放、详情展示，专用移动端 API 代理，备用API集数不可用时自动跳到下一集
+- **Mikan Project集成**：ACG搜索双源系统（ACG.RIP和Mikan Project），支持源切换、统一响应格式和完整种子元数据
+- **短剧完整功能**：短剧搜索、播放、详情展示，专用移动端 API 代理，备用API集数不可用时自动跳到下一集，备用API支持
 - **IPTV 直播**：m3u/m3u8 订阅、EPG 节目单（支持多源和 url-tvg）、直播源聚合、台标代理、频道当前源内搜索、直播源标签页快速搜索、长频道名点击展开功能
-- **Bangumi 动漫**：动漫信息智能检测、API 集成、缓存机制
-- **繁体中文搜索支持**：智能繁简转换、多策略搜索、轻量级switch-chinese库、优化繁体用户搜索体验
+- **Bangumi 动漫**：动漫信息智能检测、API 集成、缓存机制、动漫内容详情优先使用 Bangumi API
+- **繁体中文搜索支持**：智能繁简转换、多策略搜索、轻量级switch-chinese库、优化繁体用户搜索体验、智能搜索变体检测
 - **2026年份筛选**：为豆瓣内容添加2026年份筛选选项，轻松查找最新上映影视
 
 #### 🤖 智能推荐系统
 - **AI 智能助手**：全局AI推荐按钮（ModernNav导航栏），支持 GPT-5/o 系列模型，动态提示词管理，85-90% 输入延迟优化，流式传输、编排器、视频上下文支持，集成豆瓣和TMDB数据，支持ID缺失时自动TMDB搜索
+- **短剧AI聊天**：为ShortDramaCard组件添加AI聊天功能，智能推荐和内容分析
 - **Tavily搜索模式**：支持无需AI API的Tavily搜索模式，提供灵活的API验证，SSE流式传输，友好的用户指导
 - **多卡片类型**：影视推荐、YouTube 视频、视频链接解析
 - **TMDB 演员搜索**：完整的演员搜索、过滤和缓存
 - **交互式演员作品查看器**：播放页面内联显示演员作品，2小时缓存，TMDB备用数据源
 - **发布日历与即将上映**：即将上线内容预览和跟踪，支持收藏即将上映内容，上映后自动可播放，2026年发布数据爬虫
+- **TanStack Query状态管理**：实现TanStack Query进行全局状态管理，优化数据获取和缓存
 
 #### 💬 弹幕生态系统
 - **第三方弹幕 API**：集成腾讯视频、爱奇艺、优酷、B站等主流平台，智能内容匹配防预告
@@ -69,6 +72,22 @@
 - **自动重试机制**：403错误自动重试，确保预告片持续可用
 - **性能日志追踪**：完整的预告片加载性能监控和日志记录
 - **电视剧内容支持**：扩展预告片支持到电视剧等非电影内容
+- **🚀 视频缓存优化（Kvrocks）**：两层缓存架构大幅减少流量消耗
+  - **Kvrocks元数据缓存**：URL映射和文件信息（15分钟TTL）
+  - **文件系统视频缓存**：本地存储视频内容（12小时TTL，最大500MB）
+  - **智能缓存命中**：首次下载后，后续请求直接从本地返回
+  - **流量节省96%**：28次请求从932MB降至33MB（实测数据）
+  - **响应速度提升**：从秒级降至毫秒级
+  - **自动过期清理**：定时清理过期缓存，释放存储空间
+  - **缓存统计API**：`GET /api/video-cache/stats` 查看缓存使用情况
+
+#### 📊 性能与监控系统
+- **性能监控仪表板**：完整的性能监控系统，支持所有API（豆瓣、搜索、列表、详情、播放记录、收藏、跳过配置、短剧）的性能监控
+- **行业基准评级**：内置行业基准评级系统，实时评估API性能表现
+- **流量监控系统**：真实流量监控、外部流量域名分解、请求列表显示和可折叠区域
+- **Cron任务监控**：添加cron监控、API过滤和48小时自动清理功能
+- **可配置任务优化**：可配置的cron任务优化以减少出站流量
+- **Kvrocks持久化**：为cron、豆瓣搜索API和外部流量监控添加Kvrocks持久化
 
 #### 🔧 代理配置系统
 - **双层代理架构**：TVBox和视频播放独立代理配置，互不干扰
@@ -100,6 +119,17 @@
 - **Mixed Content处理**：优化CORS检测处理混合内容情况
 - **CORS统计面板**：管理后台显示直连/代理模式统计数据
 - **自动降级**：CORS不可用时自动切换到代理模式
+
+#### 🔐 信任网络模式
+- **内网部署免登录**：内网/局域网部署可配置跳过登录认证，方便家庭环境使用
+- **IP白名单**：支持配置可信任的IP地址或CIDR范围
+- **IPv6支持**：完整支持IPv6地址白名单配置
+- **24小时缓存优化**：通过cookie版本号机制实现配置变更立即生效
+
+#### ⚖️ 视频源权重系统
+- **源优先级配置**：为每个视频源设置权重值，控制播放源选择优先级
+- **智能源排序**：根据权重自动排序可用播放源
+- **灵活调整**：在管理后台可视化调整源权重
 
 #### 📊 用户管理增强
 - **多Provider OIDC认证**：支持同时配置多个OAuth提供商（Google、Microsoft、GitHub、Facebook、微信、Apple、LinuxDo），用户可选择喜欢的方式登录
@@ -169,6 +199,7 @@
 - **演员头像与推荐影片**：播放页展示演员头像（支持 celebrity 和 personage URL）、类似影片推荐，智能图片代理（自动迁移 direct 到 server 模式）
 - **完结系列集数统计**：搜索和分类页面显示完结系列的总集数，方便用户了解内容规模
 - **动漫分类默认排序**：为动漫分类页面默认使用"最近热度"排序
+- **短剧卡片交互增强**：新增短剧卡片的右键和长按上下文菜单功能，支持快捷操作
 - **用户菜单增强**：更新提醒、继续观看（含新剧集徽章）、我的收藏快捷入口、TVBox设置集成
 - **登录界面现代化**：动态随机壁纸、渐变卡片、响应式设计
 - **返回顶部按钮**：发布日历等长页面快捷返回
@@ -178,6 +209,8 @@
 - **TVBox 安全集成**：IP 白名单、用户专属 Token 认证、完整 API 兼容、智能搜索代理、手动源开关控制、完整源解析支持
 - **TVBox 智能搜索代理**：成人内容过滤、路径前缀支持、UI 控制开关
 - **成人内容管理**：双层过滤系统、自动检测、批量操作、用户/组级别控制
+- **豆瓣反爬虫验证**：添加豆瓣反爬虫验证机制，支持Cookies认证，提升数据获取稳定性
+- **广告过滤增强**：基于关键词的智能广告检测功能，自动识别和过滤广告内容
 - **视频源导入导出**：支持数组和配置文件格式导出，便于备份和迁移
 - **订阅源管理**：替换订阅源而非合并，支持自动拉取远程配置
 - **备用 API 支持**：搜索和首页数据加载支持备用 API，当主 API 失败时自动切换，提高系统稳定性和可用性
@@ -219,6 +252,7 @@
 - ✅ 多源影视聚合搜索（流式输出、智能变体、语言感知过滤、备用 API 支持、繁体中文支持）
 - ✅ YouTube 集成（搜索、直播、iframe 播放、时间筛选和排序）
 - ✅ 网盘搜索（PanSou 集成、高级筛选、缓存管理）
+- ✅ ACG种子搜索（ACG.RIP和Mikan Project双源系统、源切换、统一响应格式、完整种子元数据）
 - ✅ 短剧完整功能（搜索、播放、专用详情页、移动端API代理）
 - ✅ IPTV 直播（m3u 订阅、EPG 节目单、多源支持、url-tvg、源聚合、频道搜索、长频道名点击展开）
 - ✅ Bangumi 动漫（信息检测、API 集成、3-6位ID支持）
@@ -228,6 +262,8 @@
 
 ### 🤖 智能推荐
 - ✅ AI 推荐系统（GPT-5/o 支持、动态提示词）
+- ✅ 短剧AI聊天（ShortDramaCard组件AI聊天功能、智能推荐和内容分析）
+- ✅ TanStack Query状态管理（全局状态管理、优化数据获取和缓存）
 - ✅ 发布日历（即将上线内容预览）
 - ✅ 豆瓣详情增强（完整演职人员信息、用户评论展示）
 - ✅ 智能搜索优化（语言感知、模糊匹配）
@@ -279,11 +315,14 @@
 - ✅ 完结系列徽章（基于vod_remarks、搜索API优先）
 - ✅ 搜索结果筛选（播放源、标题、年份筛选，年份排序）
 - ✅ 视频卡片右键/长按菜单（新标签页播放、收藏等操作）
+- ✅ 短剧卡片右键/长按菜单（右键和长按上下文菜单、快捷操作支持）
 - ✅ z-index层级优化（卡片、徽章、模态框正确叠加显示）
 
 ### 🔐 安全与存储
 - ✅ TVBox 完整 API（IP 白名单、用户专属Token认证、智能搜索代理、手动源开关、完整源解析）
 - ✅ TVBox 智能搜索代理（成人内容过滤、路径前缀支持、UI控制）
+- ✅ 信任网络模式（内网部署免登录、IP白名单、IPv6支持、24小时缓存优化）
+- ✅ 视频源权重系统（源优先级配置、智能源排序、可视化调整）
 - ✅ 成人内容管理系统（双层过滤、自动检测、批量操作、用户/组级别控制）
 - ✅ 视频源导入导出（数组/配置文件格式、备份迁移、快速复制按钮）
 - ✅ 备用 API 支持（主 API 失败自动切换、提高系统稳定性）
@@ -296,6 +335,8 @@
 - ✅ 内存缓存防 QuotaExceededError
 - ✅ 用户注册系统（可配置开关）
 - ✅ 图片代理优化（性能改进、百度图片代理选项、缓存策略优化）
+- ✅ 豆瓣反爬虫验证（豆瓣反爬虫验证机制、Cookies认证支持、提升数据获取稳定性）
+- ✅ 广告过滤增强（基于关键词的智能广告检测、自动识别和过滤广告内容）
 
 ### 🛠️ 技术优化
 - ✅ ArtPlayer 5.3.0 + HLS.js 1.6.15
@@ -304,6 +345,11 @@
 - ✅ Docker 构建优化
 - ✅ TypeScript 类型安全
 - ✅ 语义化版本管理
+- ✅ 性能监控系统（完整的性能监控仪表板、支持所有API性能监控、行业基准评级系统）
+- ✅ 流量监控系统（真实流量监控、外部流量域名分解、请求列表显示和可折叠区域）
+- ✅ Cron任务监控（cron监控、API过滤、48小时自动清理功能）
+- ✅ Kvrocks持久化（为cron、豆瓣搜索API和外部流量监控添加持久化）
+- ✅ 视频缓存系统（12小时TTL视频缓存、Kvrocks元数据缓存、文件系统视频缓存、智能缓存命中）
 
 ---
 
@@ -314,6 +360,8 @@
   - [Docker 部署（推荐）](#-推荐部署方案kvrocks-存储)
   - [飞牛OS 部署](#-飞牛osfnos部署)
   - [Zeabur 部署（推荐）](#️-zeabur-部署推荐)
+  - [Hugging Face Space 部署（免费）](#-hugging-face-space-部署免费)
+  - [EdgeOne Pages 部署（免费）](#-edgeone-pages-部署免费)
   - [Vercel 部署（无服务器）](#-vercel-部署无服务器)
 - [配置文件](#-配置文件)
 - [环境变量](#-环境变量)
@@ -346,6 +394,31 @@
 ---
 
 ## 🚀 部署
+
+### 💻 最低配置要求
+
+为确保流畅运行，建议服务器满足以下最低配置：
+
+#### Docker 自托管部署
+- **CPU**: 2 核心（推荐 4 核心）
+- **内存**: 2GB RAM（推荐 4GB）
+- **存储**: 10GB 可用空间（推荐 20GB，用于视频缓存和数据库）
+- **网络**: 10Mbps 上行带宽（推荐 100Mbps）
+
+#### Zeabur / Vercel 云端部署
+- **无需自备服务器**：平台自动分配资源
+- **Zeabur**: Developer Plan 提供最多 2 vCPU 和 4GB RAM（$5/月含 $5 credit，用量不超过则免费）
+- **Vercel**: 无服务器架构，按需自动扩容
+
+#### ⚠️ 常见卡顿原因
+- ❌ **CPU 不足**：单核或低频 CPU 会导致视频转码和搜索缓慢
+- ❌ **内存不足**：少于 2GB 内存会导致频繁 OOM（内存溢出）
+- ❌ **网络带宽低**：上行带宽低于 5Mbps 会导致视频播放卡顿
+- ❌ **磁盘 I/O 慢**：使用机械硬盘会影响数据库和缓存性能
+
+**💡 提示**：如果遇到卡顿问题，请先检查服务器配置是否满足最低要求！
+
+---
 
 ### ⚡ 一键部署到 Zeabur（最简单）
 
@@ -386,9 +459,12 @@ services:
       - PASSWORD=your_secure_password
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
       - KVROCKS_URL=redis://moontv-kvrocks:6666
+      - VIDEO_CACHE_DIR=/app/video-cache  # 视频缓存目录
       # 可选：站点配置
       - SITE_BASE=https://your-domain.com
       - NEXT_PUBLIC_SITE_NAME=LunaTV Enhanced
+    volumes:
+      - video-cache:/app/video-cache  # 视频缓存持久化
     networks:
       - moontv-network
     depends_on:
@@ -409,6 +485,7 @@ networks:
 
 volumes:
   kvrocks-data:
+  video-cache:  # 视频缓存 volume
 ```
 
 ### 🔴 Redis 存储（有数据丢失风险）
@@ -575,6 +652,7 @@ Zeabur 是一站式云端部署平台，使用预构建的 Docker 镜像可以�
    # 必填：存储配置
    NEXT_PUBLIC_STORAGE_TYPE=kvrocks
    KVROCKS_URL=redis://apachekvrocks:6666
+   VIDEO_CACHE_DIR=/app/video-cache
 
    # 可选：站点配置
    SITE_BASE=https://your-domain.zeabur.app
@@ -642,6 +720,186 @@ Zeabur 是一站式云端部署平台，使用预构建的 Docker 镜像可以�
 - **区域选择**：建议选择离用户最近的区域部署
 - **服务网络**：同一 Project 中的服务通过服务名称互相访问（如 `apachekvrocks:6666`）
 - **持久化存储**：KVRocks 必须配置持久化卷到 `/var/lib/kvrocks/db` 目录，否则重启后数据丢失
+
+---
+
+### 🤗 Hugging Face Space 部署（免费）
+
+[Hugging Face Spaces](https://huggingface.co/spaces) 提供免费的 Docker 容器托管服务，配置为 **2 核 CPU、16GB 内存、50GB 存储**，非常适合个人使用。
+
+#### 部署步骤
+
+1. **创建 Hugging Face 账号**
+   - 访问 [huggingface.co](https://huggingface.co/) 注册账号
+
+2. **创建新 Space**
+   - 访问 [huggingface.co/new-space](https://huggingface.co/new-space)
+   - 填写 Space 名称（如 `lunatv`）
+   - **Space SDK** 选择 `Docker`
+   - **Space hardware** 选择 `CPU basic`（免费）
+   - 点击 `Create Space`
+
+3. **配置 README.md**
+
+   在 Space 仓库根目录创建或编辑 `README.md`，添加以下 YAML 元数据：
+
+   ```yaml
+   ---
+   title: LunaTV
+   emoji: 🎬
+   colorFrom: green
+   colorTo: blue
+   sdk: docker
+   app_port: 3000
+   pinned: false
+   ---
+   ```
+
+   > 💡 **关键配置**：`app_port: 3000` 告诉 HF 应用运行在 3000 端口
+
+4. **创建 Dockerfile**
+
+   在 Space 仓库根目录创建 `Dockerfile`，仅需一行：
+
+   ```dockerfile
+   FROM ghcr.io/szemeng76/lunatv:latest
+   ```
+
+   > 💡 这会直接使用 LunaTV 官方 Docker 镜像，无需构建
+
+5. **配置环境变量（Secrets）**
+
+   在 Space 页面点击 `Settings` > `Variables and secrets`，添加以下 Secrets：
+
+   | 变量名 | 说明 | 示例值 |
+   |--------|------|--------|
+   | `USERNAME` | 管理员账号 | `admin` |
+   | `PASSWORD` | 管理员密码 | `your_secure_password` |
+   | `NEXT_PUBLIC_STORAGE_TYPE` | 存储类型 | `upstash` |
+   | `UPSTASH_URL` | Upstash REST URL | `https://xxx.upstash.io` |
+   | `UPSTASH_TOKEN` | Upstash Token | `AxxxQ==` |
+   | `DISABLE_HERO_TRAILER` | 禁用首页预告片 | `true` |
+
+   > ⚠️ **注意**：HF Space 无持久化存储，必须使用 Upstash 等外部数据库
+   >
+   > 💡 **建议**：设置 `DISABLE_HERO_TRAILER=true` 禁用首页预告片，因为预告片 URL 带时间戳会定时过期，无持久化存储的平台无法缓存视频，每次刷新都要重新下载
+
+6. **等待部署完成**
+   - 提交文件后，HF 会自动拉取镜像并启动容器
+   - 部署完成后，访问 `https://huggingface.co/spaces/你的用户名/lunatv`
+
+#### 📁 完整文件结构
+
+```
+your-space/
+├── README.md      # 包含 YAML 元数据
+└── Dockerfile     # FROM ghcr.io/szemeng76/lunatv:latest
+```
+
+#### ✨ Hugging Face Space 优势
+
+- ✅ **完全免费**：2 核 CPU、16GB 内存、50GB 存储
+- ✅ **无需服务器**：托管在 HF 云端
+- ✅ **自动 HTTPS**：自带 SSL 证书
+- ✅ **简单部署**：只需两个文件
+- ✅ **使用官方镜像**：无需构建，直接拉取
+
+#### ⚠️ Hugging Face Space 注意事项
+
+- **无持久化存储**：必须使用 Upstash 等外部数据库存储数据
+- **冷启动**：长时间无访问后首次访问较慢（约 30-60 秒）
+- **48小时休眠**：免费版 48 小时无访问会自动休眠，再次访问会重新启动
+- **公开仓库**：Space 仓库默认公开，Secrets 除外
+- **流量限制**：免费版有一定流量限制，个人使用足够
+
+#### 🔗 相关链接
+
+- [Hugging Face Spaces 文档](https://huggingface.co/docs/hub/spaces)
+- [Docker Spaces 文档](https://huggingface.co/docs/hub/spaces-sdks-docker)
+- [Upstash 免费 Redis](https://upstash.com/)
+
+---
+
+### 🌐 EdgeOne Pages 部署（免费）
+
+[EdgeOne Pages](https://edgeone.ai/products/pages) 是腾讯云提供的边缘计算平台，类似于 Vercel，支持 Next.js SSR/SSG/ISR 部署，适合国内用户访问。
+
+#### 部署步骤
+
+1. **准备工作**
+   - 注册 [EdgeOne](https://edgeone.ai/) 账号
+   - 在 [Upstash](https://upstash.com/) 创建 Redis 实例（EdgeOne Pages 无持久化存储）
+   - Fork 本项目到你的 GitHub/GitLab 账号
+
+2. **创建 Pages 项目**
+   - 登录 EdgeOne 控制台
+   - 进入 "Pages" > "创建项目"
+   - 选择 "连接 Git 仓库"
+   - 授权并选择你 Fork 的 LunaTV 仓库
+
+3. **配置构建设置**
+   - **框架预设**：选择 `Next.js`
+   - **构建命令**：`pnpm build`（或保持默认）
+   - **输出目录**：`.next`（默认）
+   - **Node.js 版本**：`20`（推荐）
+
+4. **配置环境变量**
+
+   在项目设置中添加以下环境变量：
+
+   ```env
+   # 必填：管理员账号
+   USERNAME=admin
+   PASSWORD=your_secure_password
+
+   # 必填：存储配置（必须使用 Upstash）
+   NEXT_PUBLIC_STORAGE_TYPE=upstash
+   UPSTASH_URL=https://your-redis-instance.upstash.io
+   UPSTASH_TOKEN=AxxxxxxxxxxxxxxxxxxxxxxxxxxxQ==
+
+   # 推荐：禁用首页预告片（无持久化存储平台建议开启）
+   DISABLE_HERO_TRAILER=true
+
+   # 可选：站点配置
+   SITE_BASE=https://your-project.edgeone.app
+   NEXT_PUBLIC_SITE_NAME=LunaTV Enhanced
+
+   # 可选：豆瓣代理配置（推荐）
+   NEXT_PUBLIC_DOUBAN_PROXY_TYPE=cmliussss-cdn-tencent
+   NEXT_PUBLIC_DOUBAN_IMAGE_PROXY_TYPE=cmliussss-cdn-tencent
+   ```
+
+5. **部署项目**
+   - 点击 "部署" 按钮
+   - 等待构建完成（首次约 3-5 分钟）
+   - 部署成功后会分配 `xxx.edgeone.app` 域名
+
+6. **绑定自定义域名（可选）**
+   - 在项目设置中点击 "域名"
+   - 添加自定义域名并配置 DNS 解析
+
+#### ✨ EdgeOne Pages 优势
+
+- ✅ **国内访问友好**：腾讯云边缘节点，国内访问速度快
+- ✅ **免费额度充足**：每月 300 万 Edge Functions 请求、100 万 Cloud Functions 请求、500 次构建、流量无限制
+- ✅ **自动 HTTPS**：免费 SSL 证书
+- ✅ **Git 自动部署**：推送代码自动触发构建
+- ✅ **支持 Next.js SSR**：完整支持服务端渲染
+
+#### ⚠️ EdgeOne Pages 注意事项
+
+- **无 Docker 支持**：EdgeOne Pages 是无服务器平台，仅支持源码构建部署
+- **必须使用 Upstash**：无持久化文件系统，需要外部数据库
+- **函数执行限制**：单次请求有执行时间限制（通常 30 秒）
+- **不支持视频缓存**：无本地文件系统，视频缓存功能不可用
+- **构建资源限制**：免费版构建时间和内存有限制
+
+#### 🔗 相关链接
+
+- [EdgeOne Pages 免费额度](https://pages.edgeone.ai/pricing)
+- [EdgeOne Pages 文档（国际区）](https://edgeone.ai/zh/document/160427672961769472)
+- [EdgeOne Pages 文档（中国区）](https://cloud.tencent.com/document/product/1552/127366)
+- [Upstash 免费 Redis](https://upstash.com/)
 
 ---
 
@@ -713,6 +971,7 @@ Zeabur 是一站式云端部署平台，使用预构建的 Docker 镜像可以�
 - **无服务器限制**：Vercel 免费版有 10 秒函数执行时间限制，某些耗时操作可能超时
 - **流量限制**：Vercel 免费版每月 100GB 流量，个人使用足够
 - **冷启动**：长时间无访问后首次访问会较慢（约 1-3 秒）
+- **不支持视频缓存**：Vercel 无持久化文件系统，无法使用视频缓存功能（视频仍可正常播放，只是每次都需要代理请求）
 - **不支持功能**：由于无服务器架构限制，以下功能可能受限：
   - 大量并发搜索请求
   - 超长视频的弹幕加载
@@ -801,6 +1060,14 @@ Zeabur 是一站式云端部署平台，使用预构建的 Docker 镜像可以�
 | `UPSTASH_URL`     | Upstash 端点          | `https://xxx.upstash.io`        |
 | `UPSTASH_TOKEN`   | Upstash Token         | `AxxxxxxxxxxxxxxxxxxxxxxxxxxxQ==`|
 
+> 💡 **Redis 兼容服务**：`REDIS_URL` 支持所有 Redis 协议兼容的服务，包括：
+> - 自建 Redis / KVRocks
+> - [Redis Cloud](https://redis.io/cloud/) - 官方云服务，免费 30MB
+> - [Aiven Valkey](https://aiven.io/valkey) - 免费 1GB，Redis 7.2 兼容
+> - [Northflank](https://northflank.com/dbaas/managed-redis) - 免费 256MB
+>
+> ⚠️ **Vercel 部署请使用 Upstash**：Vercel Serverless 函数是无状态的，每次请求可能冷启动新实例。TCP 长连接的 Redis 服务（Redis Cloud、Aiven、Northflank 等）在此环境下会遇到连接池失效、冷启动延迟高、连接数耗尽等问题。Upstash 基于 HTTP REST API，天然适配 Serverless 环境，是 Vercel 部署的唯一推荐存储方案。
+
 ### 可选配置
 
 | 变量                                | 说明                 | 默认值      | 可选值                    |
@@ -815,6 +1082,12 @@ Zeabur 是一站式云端部署平台，使用预构建的 Docker 镜像可以�
 | `NEXT_PUBLIC_DOUBAN_IMAGE_PROXY`    | 自定义图片代理       | 空          | URL prefix                |
 | `NEXT_PUBLIC_DISABLE_YELLOW_FILTER` | 关闭色情内容过滤     | `false`     | `true` / `false`          |
 | `NEXT_PUBLIC_FLUID_SEARCH`          | 流式搜索输出         | `true`      | `true` / `false`          |
+| `DISABLE_HERO_TRAILER`              | 禁用首页预告片       | `false`     | `true` / `false`          |
+
+> 💡 **DISABLE_HERO_TRAILER**：首页 HeroBanner 预告片会消耗较多流量，且预告片 URL 带时间戳会定时过期。
+> - **Vercel**：自动禁用（无需设置）
+> - **Docker/VPS（可挂载持久化卷）**：无需禁用，视频会缓存到本地（`VIDEO_CACHE_DIR`），URL 过期后自动刷新并重新缓存
+> - **ClawCloud、HF Space、EdgeOne Pages 等无持久化平台**：建议设置 `DISABLE_HERO_TRAILER=true`，因为无法缓存视频，URL 过期后每次刷新都要重新下载
 
 ### 豆瓣代理说明
 
@@ -1040,35 +1313,55 @@ services:
 
 完整的功能更新和 Bug 修复记录请查看 [CHANGELOG](CHANGELOG)。
 
-### 最新版本：v5.9.3 (2026-01-13)
+### 最新版本：v6.1.1 (2026-02-01)
 
 #### 新增功能
-- 📱 直播长频道名点击展开功能：为移动端长频道名添加点击展开/收起功能
-- ⚡ 下载功能增强：添加片段时长追踪、时间范围和完整视频总时长显示
-- 🔍 繁体中文搜索支持：添加繁体中文搜索功能，提升繁体用户搜索体验
-- 📅 2026年份筛选选项：为豆瓣内容添加2026年份筛选功能
-- 📚 fnOS部署指南：添加飞牛NAS（fnOS）部署指南到README文档
-- 📺 TVBox源管理增强：添加手动开关和完整源解析支持
-- 🖼️ 百度图片代理选项：为豆瓣图片添加百度图片代理选项，提供更多代理方式
+- 🔍 搜索历史UX优化：清空输入时始终显示搜索历史
+- 💾 ACG搜索数据库缓存：为ACG搜索添加数据库缓存，提升搜索体验
+- ✏️ 视频源编辑功能：添加视频源编辑功能，改进短剧处理逻辑
+- 📊 性能监控增强：显示CPU核心数和型号名称，添加进程级指标
+- 🔄 首页数据缓存：实现GlobalCacheContext首页数据全局缓存
+- 💬 弹幕系统增强：防重叠开关、实时滑块控制、自定义弹幕API支持
+- 📦 视频缓存LRU淘汰：实现视频缓存LRU淘汰策略
+- 🔐 信任网络模式：内网部署可跳过登录认证，支持IPv6白名单
+- ⚖️ 视频源权重/优先级系统：添加源权重系统优化播放源选择
+- 🎌 Bangumi API优先：动漫内容详情优先使用Bangumi API
+- 🔍 智能搜索变体检测：添加智能搜索变体检测，支持并行执行
+- 📹 短剧备用API：添加短剧推荐和列表的备用API支持
+- 🎬 DISABLE_HERO_TRAILER环境变量：添加环境变量控制预告片播放
+- 📚 部署文档更新：添加HF Space和EdgeOne Pages部署指南
 
 #### 性能优化
-- ⚡ 繁体中文搜索全面优化：采用轻量级switch-chinese库、tree-shakeable导入、单例模式、多策略搜索、限制转换范围（前3个变体）、移除冗余detect()调用
-- 🔧 TVBox优化：User-Agent更新为okhttp/4.1.0，优化管理后台开关布局
-- 🚀 User-Agent全面升级：更新所有User-Agent到2026年最新版本（Chrome 135, Firefox 146, Safari 26, Edge 143）
-- ⚡ 图片代理性能优化：改进图片代理性能和缓存策略
+- 🔨 重构短剧源聚合：动态分类检测，改进短剧源聚合逻辑
+- ⚡ Cron API全面优化：并发处理、超时控制、监控、重试机制、任务统计和并行化
+- ⚡ 直播频道性能优化：添加超时控制和EPG缓存
+- ⚡ AI推荐请求优化：仅在后台开关启用时发送AI推荐请求
+- ⚡ Redis优化：KEYS替换为SCAN避免阻塞，Upstash减少命令使用量
+- ⚡ 豆瓣页面智能防抖：添加智能防抖和flushSync优化
+- ⚡ 视频缓存优化：优化清理逻辑、错误处理，增加缓存上限
+- ⚡ 信任网络缓存优化：24小时缓存，通过cookie版本号立即刷新配置
 
 #### Bug 修复
-- 🐛 修复直播移动端频道名显示：优化移动端频道名显示，添加chevron指示器用于可展开名称
-- 🐛 修复HeroBanner标题溢出问题：移除最大宽度限制，防止标题截断和溢出容器
-- 🐛 修复Tavily API密钥未保存提醒：添加未保存更改警告
-- 🐛 修复EPG频道解析：支持多行XML格式的频道解析
-- 🐛 修复TVBox配置和解析：支持加密配置（Base64）、JSON注释解析、M3U8代理源键传递、完整URL解析修复直播片段500错误
-- 🐛 修复TVBox功能问题：AdminConfig类型定义、编辑模式开关状态更新、解析和播放模式改进
-- 🐛 修复UI问题：标签按钮可见性和移动端响应式、搜索分类按钮深色模式对比度、ScrollableRow隐藏按钮捕获指针事件、Firefox悬停消失问题
-- 🐛 修复部署问题：Zeabur部署standalone模式、时间范围显示条件运算符优先级、繁简转换应用范围
+- 🐛 修复UserMenu导航卡死：通过router优化解决导航卡死问题
+- 🐛 修复ACG搜索按钮显示：改进动漫内容的ACG搜索按钮显示逻辑
+- 🐛 修复短剧系统：替换失效API、解决CORS问题、验证空数据、修复字段映射、自动选择分类、隐藏零评分、防止空缓存
+- 🐛 修复配置订阅覆盖：保留用户手动修改的配置（直播源、自定义分类的disabled状态）
+- 🐛 修复源详情提前设置：移除fetchSourceDetail中过早的setAvailableSources调用
+- 🐛 修复筛选标签排序选择：始终显示排序选择
+- 🐛 修复Cron性能阈值：使用宽松的性能阈值评估任务
+- 🐛 修复播放记录传参：将douban_id和type传递到VideoCard
+- 🐛 修复移动端响应式：Spider Jar状态溢出、TVBox安全配置、信任网络配置、管理页面底部内边距、短剧卡片徽章重叠
+- 🐛 修复弹幕系统：过滤占位符弹幕、纠正响应验证和超时输入UX
+- 🐛 修复三星浏览器深色模式：添加color-scheme meta标签
+- 🐛 修复流式代理并发请求：防止并发请求，移除Content-Length头
+- 🐛 修复Vercel预告片带宽：Vercel环境禁用首页预告片视频
+- 🐛 修复Kvrocks持久化：禁用外部流量监控和性能监控的持久化
 
 ### 重大里程碑版本
 
+- **v6.1.1**：信任网络模式、视频源权重系统、Bangumi API优先、智能搜索变体、短剧备用API、弹幕系统增强、视频缓存LRU淘汰、配置订阅修复
+- **v6.1.0**：性能监控系统、流量监控系统、TanStack Query状态管理、Kvrocks持久化、豆瓣反爬虫验证、Mikan Project集成、视频缓存系统、短剧AI聊天、广告过滤增强
+- **v6.0.0**：主页性能大幅优化（CPU降至50-80%）、Puppeteer反爬虫系统、豆瓣移动端API回退、Web Worker优化、播放进度恢复、依赖升级
 - **v5.9.3**：繁体中文搜索支持、下载功能增强、TVBox源管理增强、User-Agent全面升级到2026最新版本、百度图片代理、fnOS部署指南
 - **v5.9.2**：豆瓣预告片系统增强、代理配置系统、M3U8下载器6倍提速、EPG系统增强、直播直连模式、移动导航Netflix风格重设计
 - **v5.9.1**：玻璃态设计、Material UI CategoryBar、Netflix风格HeroBanner、AI功能全面增强、豆瓣缓存优化
